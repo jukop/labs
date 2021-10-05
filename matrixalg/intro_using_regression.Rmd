@@ -1,12 +1,15 @@
 ---
-layout: page
 title: "Introduction to Linear Models"
+author: "Mike Love"
+fontsize: 8pt
+output: 
+  beamer_presentation:
+    slide_level: 4
 ---
+\fontsize{12}{22}
+\fontseries{b}
+\selectfont
 
-```{r options, echo=FALSE}
-library(knitr)
-opts_chunk$set(fig.path=paste0("figure/", sub("(.*).Rmd","\\1",basename(knitr:::knit_concord$get('infile'))), "-"))
-```
 
 # Matrix Algebra
 
@@ -28,13 +31,16 @@ Imagine you are Galileo in the 16th century trying to describe the velocity of a
 set.seed(1)
 g <- 9.8 ##meters per second
 n <- 25
-tt <- seq(0,3.4,len=n) ##time in secs, note: we use tt because t is a base function
+tt <- seq(0,3.4,len=n) ##time in secs, note: 
+## we use tt because t is a base function
 d <- 56.67  - 0.5*g*tt^2 + rnorm(n,sd=1) ##meters
 ```
 
 The assistants hand the data to Galileo and this is what he sees:
 
-```{r gravity, fig.cap="Simulated data for distance travelled versus time of falling object measured with error."}
+#### Falling objects
+
+```{r gravity, fig.cap="Simulated data for distance travelled versus time of falling object measured with error.", out.width="50%"}
 mypar()
 plot(tt,d,ylab="Distance in meters",xlab="Time in seconds")
 ```
@@ -46,6 +52,7 @@ $$ Y_i = \beta_0 + \beta_1 x_i + \beta_2 x_i^2 + \varepsilon_i, i=1,\dots,n $$
 With $Y_i$ representing location, $x_i$ representing the time, and $\varepsilon_i$ accounting for measurement error. This is a linear model because it is a linear combination of known quantities (the $x$'s) referred to as predictors or covariates and unknown parameters (the $\beta$'s).
 
 #### Father & son heights
+
 Now imagine you are Francis Galton in the 19th century and you collect paired height data from fathers and sons. You suspect that height is inherited. Your data:
 
 ```{r,message=FALSE}
@@ -56,9 +63,10 @@ y=father.son$sheight
 
 looks like this:
 
-```{r galton_data, fig.cap="Galton's data. Son heights versus father heights."}
+```{r galton_data, fig.cap="Galton's data. Son heights versus father heights.", out.width="50%"}
 plot(x,y,xlab="Father's height",ylab="Son's height")
 ```
+#### Father & son heights
 
 The sons' heights do seem to increase linearly with the fathers' heights. In this case, a model that describes the data is as follows:
 
@@ -78,10 +86,11 @@ filename <- "femaleMiceWeights.csv"
 if (!file.exists(filename)) download(url,destfile=filename)
 ```
 
-```{r mice_weights,fig.cap="Mouse weights under two diets."}
+```{r mice_weights,fig.cap="Mouse weights under two diets.", out.width="50%"}
 dat <- read.csv("femaleMiceWeights.csv")
 mypar(1,1)
-stripchart(Bodyweight~Diet,data=dat,vertical=TRUE,method="jitter",pch=1,main="Mice weights")
+stripchart(Bodyweight ~ Diet, data=dat, vertical=TRUE, 
+           method="jitter", pch=1, main="Mice weights")
 ```
 
 We want to estimate the difference in average weight between populations. We demonstrated how to do this using t-tests and confidence intervals, based on the difference in sample averages. We can obtain the same exact results using a linear model:
@@ -115,6 +124,7 @@ $$ \sum_{i=1}^n \left\{  Y_i - \left(\beta_0 + \sum_{j=1}^p \beta_j x_{i,j}\righ
 Once we find the minimum, we will call the values the least squares estimates (LSE) and denote them with $\hat{\beta}$. The quantity obtained when evaluating the least squares equation at the estimates is called the residual sum of squares (RSS). Since all these quantities depend on $Y$, *they are random variables*. The $\hat{\beta}$ s are random variables and we will eventually perform inference on them.
 
 #### Falling object example revisited
+
 Thanks to my high school physics teacher, I know that the equation for the trajectory of a falling object is: 
 
 $$d = h_0 + v_0 t -  0.5 \times 9.8 t^2$$
@@ -129,9 +139,11 @@ f <- 56.67  - 0.5*g*tt^2
 y <-  f + rnorm(n,sd=1)
 ```
 
+#### Falling object example revisited
+
 Here is what the data looks like with the solid line representing the true trajectory:
 
-```{r simulate_drop_data_with_fit, fig.cap="Fitted model for simulated data for distance travelled versus time of falling object measured with error."}
+```{r simulate_drop_data_with_fit, fig.cap="Fitted model for simulated data for distance travelled versus time of falling object measured with error.", out.width="50%"}
 plot(tt,y,ylab="Distance in meters",xlab="Time in seconds")
 lines(tt,f,col=2)
 ```
@@ -168,7 +180,7 @@ rss <- function(Beta0,Beta1,Beta2){
 
 So for any three dimensional vector we get an RSS. Here is a plot of the RSS as a function of $\beta_2$ when we keep the other two fixed:
 
-```{r rss_versus_estimate, fig.cap="Residual sum of squares obtained for several values of the parameters."}
+```{r rss_versus_estimate, fig.cap="Residual sum of squares obtained for several values of the parameters.", out.width="50%"}
 Beta2s<- seq(-10,0,len=100)
 plot(Beta2s,sapply(Beta2s,rss,Beta0=55,Beta1=0),
      ylab="RSS",xlab="Beta2",type="l")
@@ -177,33 +189,35 @@ Beta2s<- seq(-10,0,len=100)
 lines(Beta2s,sapply(Beta2s,rss,Beta0=65,Beta1=0),col=2)
 ```
 
+#### The least squares estimate (LSE)
+
 Trial and error here is not going to work. Instead, we can use calculus: take the partial derivatives, set them to 0 and solve. Of course, if we have many parameters, these equations can get rather complex. Linear algebra provides a compact and general way of solving this problem. 
 
 
-#### More on Galton (Advanced)
+<!-- #### More on Galton (Advanced) -->
 
-When studying the father-son data, Galton made a fascinating discovery using exploratory analysis.
+<!-- When studying the father-son data, Galton made a fascinating discovery using exploratory analysis. -->
 
-![Galton's plot.](http://upload.wikimedia.org/wikipedia/commons/b/b2/Galton's_correlation_diagram_1875.jpg) 
+<!-- ![Galton's plot.](http://upload.wikimedia.org/wikipedia/commons/b/b2/Galton's_correlation_diagram_1875.jpg)  -->
 
-He noted that if he tabulated the number of father-son height pairs and followed all the x,y values having the same totals in the table, they formed an ellipse. In the plot above, made by Galton, you see the ellipse formed by the pairs having 3 cases. This then led to modeling this data as correlated bivariate normal which we described earlier: 
+<!-- He noted that if he tabulated the number of father-son height pairs and followed all the x,y values having the same totals in the table, they formed an ellipse. In the plot above, made by Galton, you see the ellipse formed by the pairs having 3 cases. This then led to modeling this data as correlated bivariate normal which we described earlier:  -->
 
-$$ 
-Pr(X<a,Y<b) =
-$$
+<!-- $$  -->
+<!-- Pr(X<a,Y<b) = -->
+<!-- $$ -->
 
 
-$$
-\int_{-\infty}^{a} \int_{-\infty}^{b} \frac{1}{2\pi\sigma_x\sigma_y\sqrt{1-\rho^2}}
-\exp{ \left\{
-\frac{1}{2(1-\rho^2)}
-\left[\left(\frac{x-\mu_x}{\sigma_x}\right)^2 -  
-2\rho\left(\frac{x-\mu_x}{\sigma_x}\right)\left(\frac{y-\mu_y}{\sigma_y}\right)+
-\left(\frac{y-\mu_y}{\sigma_y}\right)^2
-\right]
-\right\}
-}
-$$
+<!-- $$ -->
+<!-- \int_{-\infty}^{a} \int_{-\infty}^{b} \frac{1}{2\pi\sigma_x\sigma_y\sqrt{1-\rho^2}} -->
+<!-- \exp{ \left\{ -->
+<!-- \frac{1}{2(1-\rho^2)} -->
+<!-- \left[\left(\frac{x-\mu_x}{\sigma_x}\right)^2 -   -->
+<!-- 2\rho\left(\frac{x-\mu_x}{\sigma_x}\right)\left(\frac{y-\mu_y}{\sigma_y}\right)+ -->
+<!-- \left(\frac{y-\mu_y}{\sigma_y}\right)^2 -->
+<!-- \right] -->
+<!-- \right\} -->
+<!-- } -->
+<!-- $$ -->
 
-We described how we can use math to show that if you keep $X$ fixed (condition to be $x$) the distribution of $Y$ is normally distributed with mean: $\mu_x +\sigma_y \rho \left(\frac{x-\mu_x}{\sigma_x}\right)$ and standard deviation $\sigma_y \sqrt{1-\rho^2}$. Note that $\rho$ is the correlation between $Y$ and $X$, which implies that if we fix $X=x$, $Y$ does in fact follow a linear model. The $\beta_0$ and $\beta_1$ parameters in our simple linear model can be expressed in terms of $\mu_x,\mu_y,\sigma_x,\sigma_y$, and $\rho$.
+<!-- We described how we can use math to show that if you keep $X$ fixed (condition to be $x$) the distribution of $Y$ is normally distributed with mean: $\mu_x +\sigma_y \rho \left(\frac{x-\mu_x}{\sigma_x}\right)$ and standard deviation $\sigma_y \sqrt{1-\rho^2}$. Note that $\rho$ is the correlation between $Y$ and $X$, which implies that if we fix $X=x$, $Y$ does in fact follow a linear model. The $\beta_0$ and $\beta_1$ parameters in our simple linear model can be expressed in terms of $\mu_x,\mu_y,\sigma_x,\sigma_y$, and $\rho$. -->
 
