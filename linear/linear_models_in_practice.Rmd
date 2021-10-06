@@ -1,12 +1,18 @@
 ---
-title: Linear models in practice
-layout: page
+title: "Linear models (in practice)"
+fontsize: 8pt
+output: 
+  beamer_presentation:
+    slide_level: 4
 ---
 
-```{r options, echo=FALSE}
-library(knitr)
-opts_chunk$set(fig.path=paste0("figure/", sub("(.*).Rmd","\\1",basename(knitr:::knit_concord$get('infile'))), "-"))
-```
+# Linear Models
+
+Many of the models we use in data analysis can be presented using matrix algebra. We refer to these types of models as _linear models_. "Linear" here does not refer to lines, but rather to linear combinations. The representations we describe are convenient because we can write models more succinctly and we have the matrix algebra mathematical machinery to facilitate computation. In this chapter, we will describe in some detail how we use matrix algebra to represent and fit.
+
+In this book, we focus on linear models that represent dichotomous groups: treatment versus control, for example. The effect of diet on mice weights is an example of this type of linear model. Here we describe slightly more complicated models, but continue to focus on dichotomous variables. 
+
+As we learn about linear models, we need to remember that we are still working with random variables. This means that the estimates we obtain using linear models are also random variables. Although the mathematics is more complex, the concepts we learned in previous chapters apply here. We begin with some exercises to review the concept of random variables in the context of linear models.
 
 #### The mouse diet example
 
@@ -25,12 +31,13 @@ if (!file.exists(filename)) download(url, filename)
 set.seed(1) #same jitter in stripchart
 ```
 
-```{r bodyweight_by_diet_stripchart, fig.cap="Mice bodyweights stratified by diet."}
+```{r bodyweight_by_diet_stripchart, fig.cap="Mice bodyweights stratified by diet.", out.width="50%"}
 dat <- read.csv("femaleMiceWeights.csv") ##previously downloaded
 stripchart(dat$Bodyweight ~ dat$Diet, vertical=TRUE, method="jitter",
            main="Bodyweight over Diet")
 ```
 
+#### {-}
 We can see that the high fat diet group appears to have higher weights on average, although there is overlap between the two samples.
 
 For demonstration purposes, we will build the design matrix $\mathbf{X}$ using the formula `~ Diet`. The group with the 1's in the second column is determined by the level of `Diet` which comes second; that is, the non-reference level. 
@@ -46,6 +53,8 @@ head(X)
 Before we use our shortcut for running linear models, `lm`, we want to review what will happen internally. Inside of `lm`, we will form the design matrix $\mathbf{X}$ and calculate the $\boldsymbol{\beta}$, which minimizes the sum of squares using the previously described formula. The formula for this solution is:
 
 $$ \hat{\boldsymbol{\beta}} = (\mathbf{X}^\top \mathbf{X})^{-1} \mathbf{X}^\top \mathbf{Y} $$
+
+#### {-}
 
 We can calculate this in R using our matrix multiplication operator `%*%`, the inverse function `solve`, and the transpose function `t`.
 
@@ -65,6 +74,8 @@ mean(s[["chow"]])
 mean(s[["hf"]]) - mean(s[["chow"]])
 ```
 
+#### {-}
+
 Finally, we use our shortcut, `lm`, to run the linear model:
 
 ```{r}
@@ -77,7 +88,7 @@ summary(fit)
 
 The following plot provides a visualization of the meaning of the coefficients with colored arrows (code not shown):
 
-```{r parameter_estimate_illustration, fig.cap="Estimated linear model coefficients for bodyweight data illustrated with arrows.",echo=FALSE}
+```{r parameter_estimate_illustration, fig.cap="Estimated linear model coefficients for bodyweight data illustrated with arrows.",echo=FALSE, out.width="50%"}
 stripchart(dat$Bodyweight ~ dat$Diet, vertical=TRUE, method="jitter",
            main="Bodyweight over Diet", ylim=c(0,40), xlim=c(0,3))
 a <- -0.25
@@ -92,9 +103,13 @@ abline(h=coefs[1]+coefs[2],col=cols[2])
 legend("right",names(coefs),fill=cols,cex=.75,bg="white")
 ```
 
+#### {-}
+
 To make a connection with material presented earlier, this simple linear model is actually giving us the same result (the t-statistic and p-value) for the difference as a specific kind of t-test. This is the t-test between two groups with the assumption that the population standard deviation is the same for both groups. This was encoded into our linear model when we assumed that the errors $\boldsymbol{\varepsilon}$ were all equally distributed.
 
 Although in this case the linear model is equivalent to a t-test, we will soon explore more complicated designs, where the linear model is a useful extension. Below we demonstrate that one does in fact get the exact same results:
+
+#### {-}
 
 Our `lm` estimates were:
 
