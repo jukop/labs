@@ -6,14 +6,66 @@ fontsize: 8pt
 output: 
   beamer_presentation:
     slide_level: 4
+classoption: "aspectratio=169"
 ---
 
+## Matrix Notation
+
+Here we introduce the basics of matrix notation. Initially this may seem over-complicated, but once we discuss examples, you will appreciate the power of using this notation to both explain and derive solutions, as well as implement them as R code. 
+
+## Solving Systems of Equations
+
+Linear algebra was created by mathematicians to solve systems of linear equations such as this:
+
+\begin{align*}
+a + b + c &= 6\\
+3a - 2b + c &= 2\\
+2a + b  - c &= 1
+\end{align*}
+
+
+It provides very useful machinery to solve these problems generally. We will learn how we can write and solve this system using matrix algebra notation:
+
+$$ 
+\,
+\begin{pmatrix}
+1&1&1\\
+3&-2&1\\
+2&1&-1
+\end{pmatrix}
+\begin{pmatrix}
+a\\
+b\\
+c
+\end{pmatrix} =
+\begin{pmatrix}
+6\\
+2\\
+1
+\end{pmatrix}
+\implies
+\begin{pmatrix}
+a\\
+b\\
+c
+\end{pmatrix} =
+\begin{pmatrix}
+1&1&1\\
+3&-2&1\\
+2&1&-1
+\end{pmatrix}^{-1}
+\begin{pmatrix}
+6\\
+2\\
+1
+\end{pmatrix}
+$$
+
+This section explains the notation used above. It turns out that we can borrow this notation for linear models in statistics as well.
 
 ## Matrix Operations
 
-In a previous section, we motivated the use of matrix algebra with this system of equations:
-
-
+Let's approach the use of matrix algebra with this system of equations:
 
 \begin{align*}
 a + b + c &= 6\\
@@ -65,8 +117,6 @@ Having described matrix notation, we will explain the operation we perform with 
 #### Multiplying by a scalar
 
 We start with one of the simplest operations: scalar multiplication. If $a$ is scalar and $\mathbf{X}$ is a matrix, then:
-
-
 \[
 \mathbf{X} = \begin{pmatrix}
   x_{1,1}&\dots & x_{1,p} \\
@@ -264,4 +314,4 @@ y <- matrix(c(6,2,1),3,1)
 solve(X)%*%y #equivalent to solve(X,y)
 ```
 
-Please note that `solve` is a function that should be used with caution as it is not generally numerically stable. We explain this in much more detail in the QR factorization section. 
+Please note that `solve` is a function that should be used with caution as it is not generally numerically stable.
