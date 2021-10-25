@@ -4,6 +4,7 @@ fontsize: 8pt
 output: 
   beamer_presentation:
     slide_level: 4
+classoption: "aspectratio=169"
 ---
 
 # Linear Models
