@@ -1,6 +1,6 @@
 ---
+title: "Expressing design formula in R"
 layout: page
-title: Expressing design formula in R
 ---
 
 ```{r options, echo=FALSE}

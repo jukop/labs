@@ -20,8 +20,9 @@ Admission data from U.C. Berkeley 1973 showed that more men were being admitted 
 
 
 ```{r}
-library(dagdata)
-data(admissions)
+#library(dagdata)
+#data(admissions)
+load(file="dagdata-master/data/admissions.rda")
 admissions$total=admissions$Percent*admissions$Number/100
 
 ##percent men get in
@@ -178,61 +179,61 @@ The confounder here is games played. Jeter played more games during the year he 
 
 <a name="genomics"></a>
 
-## Confounding: High-Throughput Example
+<!-- ## Confounding: High-Throughput Example -->
 
-To describe the problem of confounding with a real example, we will use a dataset from [this paper](http://www.ncbi.nlm.nih.gov/pubmed/17206142) that claimed that roughly 50% of genes where differentially expressed when comparing blood from two ethnic groups. We include the data in one of our data packages:
+<!-- To describe the problem of confounding with a real example, we will use a dataset from [this paper](http://www.ncbi.nlm.nih.gov/pubmed/17206142) that claimed that roughly 50% of genes where differentially expressed when comparing blood from two ethnic groups. We include the data in one of our data packages: -->
 
-```{r,message=FALSE}
-library(Biobase) ##available from Bioconductor
-library(genefilter) 
-library(GSE5859) ##available from github
-data(GSE5859)
-```
+<!-- ```{r,message=FALSE} -->
+<!-- library(Biobase) ##available from Bioconductor -->
+<!-- library(genefilter)  -->
+<!-- library(GSE5859) ##available from github -->
+<!-- data(GSE5859) -->
+<!-- ``` -->
 
-We can extract the gene expression data and sample information table using the Bioconductor functions `exprs` and `pData` like this:
+<!-- We can extract the gene expression data and sample information table using the Bioconductor functions `exprs` and `pData` like this: -->
 
-```{r}
-geneExpression = exprs(e)
-sampleInfo = pData(e)
-```
+<!-- ```{r} -->
+<!-- geneExpression = exprs(e) -->
+<!-- sampleInfo = pData(e) -->
+<!-- ``` -->
 
-Note that some samples were processed at different times.
+<!-- Note that some samples were processed at different times. -->
 
-```{r}
-head(sampleInfo$date)
-```
+<!-- ```{r} -->
+<!-- head(sampleInfo$date) -->
+<!-- ``` -->
 
-This is an extraneous variable and should not affect the values in `geneExpression`. However, as we have seen in previous analyses, it does appear to have an effect. We will therefore explore this here.
+<!-- This is an extraneous variable and should not affect the values in `geneExpression`. However, as we have seen in previous analyses, it does appear to have an effect. We will therefore explore this here. -->
 
-We can immediately see that year and ethnicity are almost completely confounded:
+<!-- We can immediately see that year and ethnicity are almost completely confounded: -->
 
-```{r}
-year = factor( format(sampleInfo$date,"%y") )
-tab = table(year,sampleInfo$ethnicity)
-print(tab)
-```
+<!-- ```{r} -->
+<!-- year = factor( format(sampleInfo$date,"%y") ) -->
+<!-- tab = table(year,sampleInfo$ethnicity) -->
+<!-- print(tab) -->
+<!-- ``` -->
 
-By running a t-test and creating a volcano plot, we note that thousands of genes appear to be differentially expressed between ethnicities. Yet when we perform a similar comparison only on the CEU population between the years 2002 and 2003, we again obtain thousands of differentially expressed genes:
+<!-- By running a t-test and creating a volcano plot, we note that thousands of genes appear to be differentially expressed between ethnicities. Yet when we perform a similar comparison only on the CEU population between the years 2002 and 2003, we again obtain thousands of differentially expressed genes: -->
 
 
-```{r volcano_plots, fig.cap="Volcano plots for gene expression data. Comparison by ethnicity (left) and by year within one ethnicity (right).", fig.width=10.5,fig.height=5.25}
-library(genefilter)
+<!-- ```{r volcano_plots, fig.cap="Volcano plots for gene expression data. Comparison by ethnicity (left) and by year within one ethnicity (right).", fig.width=10.5,fig.height=5.25} -->
+<!-- library(genefilter) -->
 
-##remove control genes
-out <- grep("AFFX",rownames(geneExpression))
+<!-- ##remove control genes -->
+<!-- out <- grep("AFFX",rownames(geneExpression)) -->
 
-eth <- sampleInfo$ethnicity
-ind<- which(eth%in%c("CEU","ASN"))
-res1 <- rowttests(geneExpression[-out,ind],droplevels(eth[ind]))
-ind <- which(year%in%c("02","03") & eth=="CEU")
-res2 <- rowttests(geneExpression[-out,ind],droplevels(year[ind]))
+<!-- eth <- sampleInfo$ethnicity -->
+<!-- ind<- which(eth%in%c("CEU","ASN")) -->
+<!-- res1 <- rowttests(geneExpression[-out,ind],droplevels(eth[ind])) -->
+<!-- ind <- which(year%in%c("02","03") & eth=="CEU") -->
+<!-- res2 <- rowttests(geneExpression[-out,ind],droplevels(year[ind])) -->
 
-XLIM <- max(abs(c(res1$dm,res2$dm)))*c(-1,1)
-YLIM <- range(-log10(c(res1$p,res2$p)))
-mypar(1,2)
-plot(res1$dm,-log10(res1$p),xlim=XLIM,ylim=YLIM,
-     xlab="Effect size",ylab="-log10(p-value)",main="Populations")
-plot(res2$dm,-log10(res2$p),xlim=XLIM,ylim=YLIM,
-     xlab="Effect size",ylab="-log10(p-value)",main="2003 v 2002")
-```
+<!-- XLIM <- max(abs(c(res1$dm,res2$dm)))*c(-1,1) -->
+<!-- YLIM <- range(-log10(c(res1$p,res2$p))) -->
+<!-- mypar(1,2) -->
+<!-- plot(res1$dm,-log10(res1$p),xlim=XLIM,ylim=YLIM, -->
+<!--      xlab="Effect size",ylab="-log10(p-value)",main="Populations") -->
+<!-- plot(res2$dm,-log10(res2$p),xlim=XLIM,ylim=YLIM, -->
+<!--      xlab="Effect size",ylab="-log10(p-value)",main="2003 v 2002") -->
+<!-- ``` -->
 

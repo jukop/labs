@@ -55,6 +55,10 @@ Before we use our shortcut for running linear models, `lm`, we want to review wh
 
 $$ \hat{\boldsymbol{\beta}} = (\mathbf{X}^\top \mathbf{X})^{-1} \mathbf{X}^\top \mathbf{Y} $$
 
+### More Mathematics Behind lm()
+
+![](LS_estimation.png)
+
 #### {-}
 
 We can calculate this in R using our matrix multiplication operator `%*%`, the inverse function `solve`, and the transpose function `t`.
