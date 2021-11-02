@@ -55,14 +55,13 @@ X
 # c)
 ??
 
-# d)
-Xsingular <- matrix(c(1:2,3*(1:2)),ncol=2,nrow=2)
+# d) 
 crossprod(1:5,6:10)
 crossprod(X,Xsingular)
 ??
 ```
 
- - e) Try to solve matrices X and Xsingular. Xsingular cannot be solved because the second column can be produced as multiplying the first column with a scalar (geometrically they are two vectors which point to the same direction but have different length). Adding a diagonal matrix even with small scalar on a diagonal will make the matrix solvable. What will happen if you change value 0.1 to 0.01 or 0.001 ?
+ - e) Try to solve matrices X and Xsingular. Xsingular cannot be solved because the second column can be produced as multiplying the first column with a scalar (geometrically they are two vectors which point to the same direction). Adding a diagonal matrix even with small scalar on a diagonal will make the matrix solvable. What will happen if you change value 0.1 to 0.01 or 0.001 ?
 ```{r, eval=FALSE}
 Xsingular <- matrix(c(1:2,3*(1:2)),ncol=2,nrow=2)
 solve(X)
@@ -71,6 +70,25 @@ solve(Xsingular + 0.1*diag(2))
 ??
 ??
 ```
+
+Explanation: In some statistical models a weighted diagonal matrix is added to allow solving a matrix. Having an increasingly smaller value added at diagonal makes the two vectors to become more and more in the same direction. This means that it will become increasingly difficult to determine the different orthogonal (90 degree angle) components from these vectors. Ultimately, this would lead to high inaccuracies in a statistical applications. Don't mind if this sounds difficult, our mathematical background is not enough to gather all the details on this topic.
+```{r}
+ZZ <- Xsingular + 0.3*diag(2)
+plot(0,0, xlim=c(-1,7),ylim=c(-1,7),xlab="",ylab="")
+arrows(0,0,ZZ[1,1],ZZ[2,1])
+arrows(0,0,ZZ[1,2],ZZ[2,2],col="red",lty=2)
+
+ZZ2 <- Xsingular + 0.1*diag(2)
+plot(0,0, xlim=c(-1,7),ylim=c(-1,7),xlab="",ylab="")
+arrows(0,0,ZZ2[1,1],ZZ2[2,1])
+arrows(0,0,ZZ2[1,2],ZZ2[2,2],col="red",lty=2)
+
+ZZ3 <- Xsingular + 0.01*diag(2)
+plot(0,0, xlim=c(-1,7),ylim=c(-1,7),xlab="",ylab="")
+arrows(0,0,ZZ3[1,1],ZZ3[2,1])
+arrows(0,0,ZZ3[1,2],ZZ3[2,2],col="red",lty=2)
+```
+
 
  - g) Try to make a 2x2 matrix $Z$ for which the $Z^T Z$ cannot be solved by solve().
 ```{r, eval=FALSE}
@@ -92,7 +110,7 @@ summary(fit)
 
 # use matrix algebra
 y <- ??
-Xfs <- cbind(??, ??)
+X <- cbind(??, ??)
 beta <- ??
 beta
 ```
@@ -237,4 +255,89 @@ m4 <- lm(?? ~ ??, data=downdat)
 summary(m4)
 ```
 
+# Solutions
+
 **If** you want to generate a nice report of your exercises, make all the error-generating code commented out, remove the text ", eval=FALSE" from all the code blocks above ("```{r}" remains). Then click Knit -button (Knit to HTML).
+
+#### Task 1
+
+```{r, eval=FALSE}
+# a)
+beta <- c(52, 0.55)
+X <- matrix(1:4,ncol=2,nrow=2)
+beta
+X
+# b)
+X %*% beta # $\beta X$
+# c)
+t(beta) %*% t(X) # $\beta^T X^T$
+# d) 
+crossprod(1:5,6:10)
+crossprod(X,Xsingular)
+
+t(1:5) %*% c(6:10)
+t(X) %*% Xsingular
+```
+
+#### Task 2
+
+```{r, eval=FALSE}
+load(file="father_and_son.Rdata")
+
+# fit a linear model
+fsmodel <- lm(sheight ~ fheight, data=father.son)
+summary(fsmodel)
+
+# use matrix algebra
+y <- father.son$sheight
+X <- cbind(1,father.son$fheight) # or model.matrix(~father.son$fheight)
+solve(t(X) %*% X) %*% t(X) %*% y
+```
+
+#### Task 3
+```{r}
+# a) one predictor: Smoke
+model.matrix(~ Smoke, data=downdat_small)
+model.matrix(~ factor(Smoke), data=downdat_small)
+
+# b) one predictor: Age
+model.matrix(~ Age, data=downdat_small)
+model.matrix(~ factor(Age), data=downdat_small)
+
+# c) one predictor: three groups
+# c) one predictor: three groups
+ageclass <- factor(c(1,1,2,2,3,3))
+model.matrix(~ ageclass)
+ageclass_new <- relevel(ageclass,2)
+model.matrix(~ ageclass_new)
+
+
+# d) main effects: Smoke and Age as categorical variables
+model.matrix(~ factor(Smoke) + Age, data=downdat_small)
+
+# e) interaction: add a term Smoke:Age in the formula
+model.matrix(~ factor(Smoke) + Age + Smoke:Age, data=downdat_small)
+model.matrix(~ factor(Smoke)*Age, data=downdat_small)
+```
+
+#### Task 4
+
+```{r}
+attach(downdat)
+
+table(Smoke,Y)
+table(Smoke,Y,Age)
+
+m1 <- lm(Y ~ Smoke,data=downdat)
+summary(m1)
+
+m2 <- lm(Y ~ Smoke + Age + Smoke:Age, data=downdat)
+summary(m2)
+# no interaction, leave Smoke:Age out
+m3 <- lm(Y ~ Smoke + Age, data=downdat)
+summary(m3)
+# smoking does not affect the down syndrome risk, leave smoking out
+m4 <- lm(Y ~ Age, data=downdat)
+summary(m4)
+```
+Smoking does not affect the chances of having a child with Down syndrome. Mother's Age was a confounder.
