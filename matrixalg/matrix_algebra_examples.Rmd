@@ -8,7 +8,7 @@ layout: page
 
 ```{r options, echo=FALSE}
 library(knitr)
-opts_chunk$set(fig.path=paste0("figure/", sub("(.*).Rmd","\\1",basename(knitr:::knit_concord$get('infile'))), "-"))
+#opts_chunk$set(fig.path=paste0("figure/", sub("(.*).Rmd","\\1",basename(knitr:::knit_concord$get('infile'))), "-"))
 ```
 
 ## Examples 
@@ -212,8 +212,10 @@ x=father.son$fheight
 y=father.son$sheight
 X <- cbind(1,x)
 betahat <- solve( t(X) %*% X ) %*% t(X) %*% y
+betahat
 ###or
-betahat <- solve( crossprod(X) ) %*% crossprod( X, y )
+betahat2 <- solve( crossprod(X) ) %*% crossprod( X, y )
+betahat2
 ```
 
 
