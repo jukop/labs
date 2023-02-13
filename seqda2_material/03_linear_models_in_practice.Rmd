@@ -18,7 +18,7 @@ As we learn about linear models, we need to remember that we are still working w
 #### Simple linear model for two groups
 
 $$ 
-Y_i = \beta_0 + \beta_1 x_i + \varepsilon_i, i=1,\dots,N 
+Y_i = \beta_0 + \beta_1 x_i + \varepsilon_i, ~i=1,\dots,n 
 $$
 where 
 $\varepsilon_i \sim N(0,\sigma^2)$.

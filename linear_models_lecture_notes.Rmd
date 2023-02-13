@@ -5,11 +5,9 @@ institute: |
   University of Eastern Finland, School of Computing
   Partly based on material of [https://github.com/genomicsclass/labs](https://github.com/genomicsclass/labs)
 date: "`r Sys.Date()`"
-fontsize: 8pt
-output: 
-  beamer_presentation:
-    slide_level: 4
-    incremental: TRUE
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -39,7 +37,7 @@ n <- 8
 x <- 0+runif(n,0,10)
 y <- 4.0 + 5.3*x + rnorm(n,sd=5)
 dat <- data.frame(x=round(x,2),y=round(y))
-#knitr::kable(dat)f
+knitr::kable(dat)
 ```
 
 The scatterplot becomes
@@ -48,31 +46,29 @@ plot(dat$x,dat$y,xlim=c(0,10),xlab="x",ylab="y")
 m1 <- lm(y~x,data=dat)
 abline(coef(m1))
 ```
-
 The coefficients of a linear regression fitted to that data set are $\beta_0=8.01$ and $\beta_1=3.90$.
- 
 <!-- TODO: explain how we can fit a linear model to a scatter plot so that we minimise the sum of squared differences -->
 
 ### Definition
 
- - Importantly, a linear regression model with one variable is a statistical model which can be formulated as
+Importantly, a linear regression model with one variable is a statistical model which can be formulated as
 \begin{equation}
 Y_i = \beta_0 + \beta_1 x_i + \varepsilon_i \label{simple-regression}
 \end{equation}
 and where $i = 1,\dots,n$ and $\varepsilon_i \sim N(0,\sigma^2)$.
 
- - There the following terminology takes place
-    - $Y_i$ is dependent
-    - $\beta_0$ is an intercept
-    - $\beta_1$ is a slope
-    - $\beta_0$ and $\beta_1$ are regression coefficients or model parameters
-    - $\varepsilon_i$ is an error term
-    - $x_i$ is the value of predictor aka independent aka covariate aka regressor
-    
-#### {-}
- - In equation $\eqref{simple-regression}$ we did not write estimated values of parameters down to the equation but used $\beta$-coefficients instead. When we write it down with $\beta$-coefficients we call it general form of linear model.
+There the following terminology takes place
 
- - Linear model with multiple predictors $X_1, X_2, \ldots, X_k$ it can be written as
+ - $Y_i$ is dependent
+ - $\beta_0$ is an intercept
+ - $\beta_1$ is a slope
+ - $\beta_0$ and $\beta_1$ are regression coefficients or model parameters
+ - $\varepsilon_i$ is an error term
+ - $x_i$ is the value of predictor aka independent aka covariate aka regressor
+
+In equation $\eqref{simple-regression}$ we did not write estimated values of parameters down to the equation but used $\beta$-coefficients instead. When we write it down with $\beta$-coefficients we call it general form of linear model.
+
+Linear model with multiple predictors $X_1, X_2, \ldots, X_k$ it can be written as
  \begin{equation}
 Y_i = \beta_0 + \beta_1 x_{i1} + \cdots \beta_k x_{ik}+ \varepsilon_i \label{multiple-regression}
 \end{equation}
@@ -80,9 +76,11 @@ and where $i = 1,\dots,n$ and $\varepsilon_i \sim N(0,\sigma^2)$.
 
 ### The fitting of linear model
 
- - We want to minimize the sum of squares of error terms $\varepsilon_i^2$, which can be written as $\varepsilon_i = Y_i - (\beta_0 + \beta_1 X_i)$. Note that error terms are in the same direction with $Y$-axis (and thus the same direction with $Y_i$).
- - We will not go into technical details of minimization here.
- - Using R we can fit the above model as follows. Assume that we have already read in data into object `dat`. We use `lm` function to fit the **l**inear **m**odel. The resulting calculation we store into object named `m1`. The data object `dat` has columns named `x` and `y` but the names could be something else as well. The first argument of `lm` is formula, which is special type in R. Formula is handy for fitting many types of models. On the left hand side of the formula one writes the dependent (e.g. what is $Y_i$), then tilde (~) and then predictor variable(s). For multiple predictors one need to put a plus sign (`+`) between the predictors.
+We want to minimize the sum of squares of error terms $\varepsilon_i^2$, which can be written as $\varepsilon_i = Y_i - (\beta_0 + \beta_1 X_i)$. Note that error terms are in the same direction with $Y$-axis (and thus the same direction with $Y_i$).
+
+We will not go into technical details of minimization here.
+
+Using R we can fit the above model as follows. Assume that we have already read in data into object `dat`. We use `lm` function to fit the **l**inear **m**odel. The resulting calculation we store into object named `m1`. The data object `dat` has columns named `x` and `y` but the names could be something else as well. The first argument of `lm` is formula, which is special type in R. Formula is handy for fitting many types of models. On the left hand side of the formula one writes the dependent (e.g. what is $Y_i$), then tilde (~) and then predictor variable(s). For multiple predictors one need to put a plus sign (`+`) between the predictors.
 ```{r}
 m1 <- lm(y ~ x, data=dat)
 m1
@@ -106,26 +104,24 @@ E(Y_i|x_i) &= E(\beta_0 + \beta_1 x_i + \varepsilon_i) \\
 \]
 because $x_i$ is constant and $E(\varepsilon_i) = 0$.
 
-Shortly put, the above calculation gives $E(Y_i|x_i) = \beta_0 +  \beta_1 x_i$, which is called a systematic part of linear model. 
-
-#### {-}
-
- - If we replace the $\beta$-notation with their estimates, then we can use that equation to calculate fitted values:
-\[\hat{Y_i} = \hat{\beta_0} + \hat{\beta_1}x_i\]
+Shortly put, the above calculation gives $E(Y_i|x_i) = \beta_0 +  \beta_1 x_i$, which is called a systematic part of linear model. If we replace the $\beta$-notation with their estimates, then we can use that equation to calculate fitted values:
+$\hat{Y_i} = \hat{\beta_0} + \hat{\beta_1}x_i$
 Fitted values are calculated for the same $x_i$ values which were in the original data.
-    ```{r}
-    fitted(m1)
-    ```
- - Prediction can be obtained by the same equation but using any value. Here we predict new values using `x=10` and `x=11`.
-    ```{r}
-    predict(m1,newdata = data.frame(x=c(10,11)))
-    ```
+```{r}
+fitted(m1)
+```
+
+
+Prediction can be obtained by the same equation but using any value. Here we predict new values using `x=10` and `x=11`.
+```{r}
+predict(m1,newdata = data.frame(x=c(10,11)))
+```
 
 ### Interpretation
 
- - We want to interpret what happens in the population of our study. That is why we use equation of expected value of $Y_i$, that is $E(Y_i|x_i) = \beta_0 +  \beta_1 x_i$ to give interpretation.
+We want to interpret what happens in the population of our study. That is why we use equation of expected value of $Y_i$, that is $E(Y_i|x_i) = \beta_0 +  \beta_1 x_i$ to give interpretation.
 
- - An interpretation of $\beta_1$ becomes available as
+An interpretation of $\beta_1$ becomes available as
 \[
 \begin{aligned}
 E(Y_i|x_i+1) - E(Y_i|x_i) &=  (\beta_0 +  \beta_1 (x_i+1)) - (\beta_0 +  \beta_1 x_i)\\
@@ -135,8 +131,9 @@ E(Y_i|x_i+1) - E(Y_i|x_i) &=  (\beta_0 +  \beta_1 (x_i+1)) - (\beta_0 +  \beta_1
 \end{aligned}
 \]
 
- - Thus, if e.g. $\beta_1 = `r coef(m1)[2]`$ then the expected value of $Y_i$ increases by $`r coef(m1)[2]`$ units of y if $x_i$ becomes increased with 1 unit of x.
- - An interpretation of intercept term $\beta_0$ becomes available if we set $x_i = 0$ since that removes $\beta_1$ from the equation. Thus $E(Y_i|x_i=0) = \beta_0 +  \beta_1 \cdot 0 = \beta_0$.
+Thus, if e.g. $\beta_1 = `r coef(m1)[2]`$ then the expected value of $Y_i$ increases by $`r coef(m1)[2]`$ units of y if $x_i$ becomes increased with 1 unit of x. 
+
+An interpretation of intercept term $\beta_0$ becomes available if we set $x_i = 0$ since that removes $\beta_1$ from the equation. Thus $E(Y_i|x_i=0) = \beta_0 +  \beta_1 \cdot 0 = \beta_0$.
 
 \newpage
 
@@ -196,8 +193,6 @@ Thus, the expected value of $Y_i$ is $\beta_0$ if diet is `chow`. If the diet is
 
 Linear algebra is a branch of mathematics where instead of numbers (aka scalars) we operate on vectors and matrices. Linear algebra is a useful tool for solving systems of linear equations, and thus suitable for handling mathematics behind linear regression. Next, we go through some of the key concepts so that we can move forward to understand how linear regression can be solved.
 
-#### Transpose
-
 Transpose of matrix $\mathbf{A}$ is denoted as $\mathbf{A}^T$
 \[
 \mathbf{A}=\begin{pmatrix}
@@ -220,7 +215,6 @@ A
 t(A)
 ```
 
-### Vector
 
 A matrix with only one column is called a vector.
 \[
@@ -237,8 +231,6 @@ d^T=\begin{bmatrix}
   1  & 3 & 5\\
 \end{bmatrix}
 \]
-
-#### Cross product
 
 A cross product (aka matrix multiplication) of row vector with a column vector is 
 \[
@@ -266,7 +258,6 @@ t(t(d))
 c(1,2,3) %*% d
 ```
 
-#### Identity matrix
 
 Identity matrix is $\mathbf{I}$ has 1 on diagonal and 0 elsewhere. E.g. 
 \[
@@ -280,7 +271,6 @@ Identity matrix is $\mathbf{I}$ has 1 on diagonal and 0 elsewhere. E.g.
 diag(3)
 ```
 
-#### Square matrix and inverse of a matrix
 
 If matrix has the same number of rows and columns, it is called a square matrix.
 
@@ -326,9 +316,6 @@ c
 1
 \end{pmatrix}
 \]
-
-#### {-}
-
 Taking the inverse of square matrix and multiplying the equation from the left hand side with that solves the system.
 \[
 \implies 
@@ -357,15 +344,12 @@ d <- c(6,2,1)
 solve(A) %*% d
 ```
 
-
 ## 5. Linear models formulated with linear algebra
 <!-- TODO: take something from labs-material -->
 
-Let's consider the previous example of two mice populations in Chapter 3. We have already seen how linear regression connects nicely with t-tests. We will now go through how it can be formulated using linear algebra.
-
-Let $x_i = \mathbf{1}(\texttt{Diet = hf})$ which means that $x_i=1$ if diet is `hf`, and $x_i = 0$ if diet is `chow`.
-
-Lets define notation of matrices and vectors
+ - Let's consider the previous example of two mice populations in Chapter 3. We have already seen how it connects nicely with t-tests. We will now go through how it can be formulated as using linear regression using matrix formulation aka linear algebra.
+ - Let $x_i = \mathbf{1}(\texttt{Diet = hf})$ which means that $x_i=1$ if diet is `hf`, and $x_i = 0$ if diet is `chow`.
+ - Lets define notation of matrices and vectors
 \[
 \mathbf{Y} = \begin{pmatrix}
 Y_1\\
@@ -392,8 +376,7 @@ Y_n
 \varepsilon_n
 \end{pmatrix}
 \]
-
-So we can write linear regression using the notation above as
+ - So we can write linear regression using the notation above as
 \[
 \,
 \begin{pmatrix}
@@ -426,12 +409,6 @@ and we can use matrix notation, so the above can be written as
 \mathbf{Y}=\mathbf{X}\boldsymbol{\beta}+\boldsymbol{\varepsilon}
 \]
 
-#### {-}
-
-\[
-\mathbf{Y}=\mathbf{X}\boldsymbol{\beta}+\boldsymbol{\varepsilon}
-\]
-
 The $\mathbf{X}$ is what we call a design matrix. We can show design matrix in R from an object of `lm` by:
 ```{r, eval=FALSE}
 model.matrix(~ Diet, data=dat)
@@ -443,9 +420,13 @@ model.matrix(m1)
 <!-- ## 4. Linear hypothesis testing with L-matrices -->
 <!-- TODO: Take inspiration to this content from the Tilastotieteen peruskurssi -->
 
-## 6. Contrasts
+## 4. Contrast matrices
 <!-- TODO: take something from labs-material -->
 <!-- See http://www.bioconductor.org/packages/release/bioc/vignettes/limma/inst/doc/usersguide.pdf pdf-page 44. -->
+
+
+
+## Interactions and Contrasts
 
 As a running example to learn about more complex linear models, we will be using a dataset which compares the different frictional coefficients on the different legs of a spider. Specifically, we will be determining whether more friction comes from a pushing or pulling motion of the leg. 
 <!-- The original paper from which the data was provided is: -->
@@ -476,12 +457,10 @@ Each measurement comes from one of our legs while it is either pushing or pullin
 ```{r, eval=F}
 View(spider)
 ```
-or just print it to console using `spider` or have a glimpse of first 6 rows
+or just print it to console using
 ```{r}
 head(spider)
 ```
-
-#### {-}
 
 We can make a boxplot
 ```{r spide_data, fig.cap="Comparison of friction coefficients of spiders' different leg pairs. The friction coefficient is calculated as the ratio of two forces (see paper Methods) so it is unitless."}
@@ -649,15 +628,11 @@ coef(fitTL)
 
 Here we have the intercept estimate, the push vs. pull estimated effect across all leg pairs, and the estimates for the L2 vs. L1 effect, the L3 vs. L1 effect, and the L4 vs. L1 effect. What if we want to compare two groups and one of those groups is not L1? The solution to this question is to use *contrasts*. 
 
-#### {-}
-
 A *contrast* is a combination of estimated coefficient: $\mathbf{c^\top} \hat{\boldsymbol{\beta}}$, where $\mathbf{c}$ is a column vector with as many rows as the number of coefficients in the linear model. If $\mathbf{c}$ has a 0 for one or more of its rows, then the corresponding estimated coefficients in $\hat{\boldsymbol{\beta}}$ are not involved in the contrast.
 
 If we want to compare leg pairs L3 and L2, this is equivalent to contrasting two coefficients from the linear model because, in this contrast, the comparison to the reference level *L1* cancels out:
 
 $$ (\mbox{L3} - \mbox{L1}) - (\mbox{L2} - \mbox{L1}) = \mbox{L3} - \mbox{L2 }$$
-
-#### {-}
 
 An easy way to make these contrasts of two groups is to use the `contrast` function from the *contrast* package. We just need to specify which groups we want to compare. We have to pick one of *pull* or *push* types, although the answer will not differ, as we will see below.
 
@@ -669,8 +644,6 @@ L3vsL2
 
 The first column `Contrast` gives the L3 vs. L2 estimate from the model we fit above.
 
-#### {-}
-
 We can show that the least squares estimates of a linear combination of coefficients is the same linear combination of the estimates. 
 Therefore, the effect size estimate is just the difference between two estimated coefficients. The contrast vector used by `contrast` is stored as a variable called `X` within the resulting object (not to be confused with our original $\mathbf{X}$, the design matrix).
 
@@ -680,8 +653,3 @@ coefs[4] - coefs[3]
 cT %*% coefs
 ```
 
-### Remarks
-
-There will be an update on exercises:
-
- - Topic of confounding (the very last) will be removed. I try to figure a task about contrasts.

@@ -1,6 +1,7 @@
 ---
-title: Interactions and contrasts
+title: "Interactions and contrasts"
 layout: page
+output: pdf_document
 ---
 
 ```{r options, echo=FALSE}
