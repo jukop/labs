@@ -1,0 +1,39 @@
+---
+title: "Presentation Title"
+author: "Name"
+institute: "Institute"
+date: "date"
+output:
+  beamer_presentation:
+    keep_tex: true
+    incremental: true
+    includes:
+      in_header: preamble.tex
+theme: "Berlin"
+colortheme: "dove"
+fonttheme: "structurebold"
+classoption: "aspectratio=169"
+---
+
+# Section 1
+
+## A vs B
+::: columns
+
+:::: column
+### A 
+\begin{itemize}
+\item<1-> Item A1
+\item<3-> Item A2
+\end{itemize}
+::::
+
+:::: column
+### B 
+\begin{itemize}
+\item<2-> Item A1
+\item<4-> Item A2
+\end{itemize}
+::::
+
+:::

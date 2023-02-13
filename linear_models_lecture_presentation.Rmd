@@ -5,9 +5,10 @@ institute: |
   University of Eastern Finland, School of Computing
   Partly based on material of [https://github.com/genomicsclass/labs](https://github.com/genomicsclass/labs)
 date: "`r Sys.Date()`"
-output:
-  pdf_document: default
-  html_document: default
+fontsize: 8pt
+output: 
+  beamer_presentation:
+    slide_level: 4
 ---
 
 ```{r setup, include=FALSE}

@@ -1,0 +1,434 @@
+---
+title: "SEQda2 Exercises"
+author: "Juho Kopra"
+date: "8th November 2021 13.15-15.00"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd("/home/jukop/Opetus/Biolääketiede/labs/seqda2_material/")
+```
+
+## Just in case if .Rmd is a new file format to you
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+# Exercises start here
+
+There is some preliminary code with the tasks. I have put double question marks (??) to places where you need to think the code yourself.
+
+### Task 1
+
+Try following functions in the situations above: t(), solve(), crossprod(), diag(), matrix(). Also use scalar product operator * and matrix product operator %*%.
+
+ - a) Study the code below. It creates a vector beta for $\beta$ and 2x2 matrix X for $\mathbf{X}$.
+ - b) Compute $\beta X$.
+ - c) Compute $\beta^T X^T$
+ - d) We use function crossprod. Explain what happens here? Try to generate the same results using only transpose (t()) and matrix product (%*%).
+
+```{r, eval=FALSE}
+# a)
+beta <- c(52, 0.55)
+X <- matrix(1:4,ncol=2,nrow=2)
+beta
+X
+# b)
+X %*% beta # $\beta X$
+
+# c)
+t(beta) %*% t(X) # $\beta^T X^T$
+
+# d) 
+Xsingular <- matrix(c(1:2,3*(1:2)),ncol=2,nrow=2)
+crossprod(1:5,6:10)
+crossprod(X,Xsingular)
+
+t(1:5) %*% c(6:10)
+t(X) %*% Xsingular
+```
+
+ - e) Try to solve matrices X and Xsingular. Xsingular cannot be solved because the second column can be produced as multiplying the first column with a scalar (geometrically they are two vectors which point to the same direction but have different length). Adding a diagonal matrix even with small scalar on a diagonal will make the matrix solvable. What will happen if you change value 0.1 to 0.01 or 0.001 ?
+```{r, eval=FALSE}
+Xsingular <- matrix(c(1:2,3*(1:2)),ncol=2,nrow=2)
+solve(X)
+
+solve(Xsingular + 0.1*diag(2))
+solve(Xsingular + 0.01*diag(2))
+solve(Xsingular + 0.001*diag(2))
+```
+
+**Explanation:** In some statistical models a weighted diagonal matrix is added to allow solving a matrix. Having an increasingly smaller value added at diagonal makes the two vectors to become more and more in the same direction. This means that it will become increasingly difficult to determine the different orthogonal (90 degree angle) components from these vectors. Ultimately, this would lead to high inaccuracies in a statistical applications. Don't mind if this sounds difficult, our mathematical background is not enough to gather all the details on this topic.
+```{r}
+Xsingular <- matrix(c(1:2,3*(1:2)),ncol=2,nrow=2)
+ZZ <- Xsingular + 0.3*diag(2)
+plot(0,0, xlim=c(-1,7),ylim=c(-1,7),xlab="",ylab="")
+arrows(0,0,ZZ[1,1],ZZ[2,1])
+arrows(0,0,ZZ[1,2],ZZ[2,2],col="red",lty=2)
+
+ZZ2 <- Xsingular + 0.1*diag(2)
+plot(0,0, xlim=c(-1,7),ylim=c(-1,7),xlab="",ylab="")
+arrows(0,0,ZZ2[1,1],ZZ2[2,1])
+arrows(0,0,ZZ2[1,2],ZZ2[2,2],col="red",lty=2)
+
+ZZ3 <- Xsingular + 0.01*diag(2)
+plot(0,0, xlim=c(-1,7),ylim=c(-1,7),xlab="",ylab="")
+arrows(0,0,ZZ3[1,1],ZZ3[2,1])
+arrows(0,0,ZZ3[1,2],ZZ3[2,2],col="red",lty=2)
+```
+
+ - g) Try to make a 2x2 matrix $Z$ for which the $Z^T Z$ cannot be solved by solve().
+```{r, eval=FALSE}
+Z <- matrix(??, nrow=2, ncol=2)
+# test your solution with R. R will print error message "system is exactly singular" if you succeed.
+??
+```
+
+### Task 2
+Use a function lm() in R to fit a linear model to the data below. Also calculate the Least Squares Estimate using a Linear Algebra and the equation
+$$ \hat{\boldsymbol{\beta}} = (\mathbf{X}^\top \mathbf{X})^{-1} \mathbf{X}^\top \mathbf{Y} $$
+
+```{r, eval=FALSE}
+load(file="father_and_son.Rdata")
+
+# fit a linear model
+fit <- lm(?? ~ ??, data=??)
+summary(fit)
+
+# use matrix algebra
+y <- ??
+Xfs <- cbind(??, ??)
+beta <- ??
+beta
+```
+
+#### Solution to Task 2
+```{r, eval=FALSE}
+load(file="father_and_son.Rdata")
+
+# fit a linear model
+fsmodel <- lm(sheight ~ fheight, data=father.son)
+summary(fsmodel)
+
+# use matrix algebra
+y <- father.son$sheight
+X <- cbind(1,father.son$fheight) # or model.matrix(~father.son$fheight)
+solve(t(X) %*% X) %*% t(X) %*% y
+```
+
+
+## Data for Tasks 3 & 4
+
+We will use a simplified (not real) data of real study problem from 1999 paper of Chi-Ling Chen, Tim J. Gilbert, Janet R. Daling ([direct link to pdf](https://academic.oup.com/aje/article-pdf/149/5/442/315402/149-5-442.pdf)). 
+
+Following code block will generate two data sets: downdat and downdat_small. We use downdat_small in Task 3 and downdat in Task 4. Study design will be the same in Task 3 and Task 4.
+```{r}
+downdat <- data.frame(Age = c(rep(c("<35","<35",">=35",">=35"),c(344, 84, 80, 201)),
+                            rep(c("<35","<35",">=35",">=35"),c(59, 18, 56, 158))),
+                      Smoke = c(rep(c(1,1,1,1),c(344, 84, 80, 201)),
+                            rep(c(2,2,2,2),c(59, 18, 56, 158))),
+                      Y = c(rep(c(0,1,0,1),c(344, 84, 80, 201)),
+                            rep(c(0,1,0,1),c(59, 18, 56, 158)))
+            )
+#downdat_small <- downdat[c(1:2,345:346,429:430,509:510,710:711,769:770,787:788,843:844),]
+#downdat_small <- downdat[c(1,345,429,509,710,769,787,843),]
+downdat_small <- unique(downdat)
+```
+
+```{r}
+knitr::kable(downdat_small)
+```
+
+### Task 3
+
+We will study the use of a design matrix here. Think about the matrix representation of linear model so that
+$$
+\,
+\begin{pmatrix}
+Y_1\\
+Y_2\\
+\vdots\\
+Y_N
+\end{pmatrix} = 
+\begin{pmatrix}
+1&x_1\\
+1&x_2\\
+\vdots\\
+1&x_N
+\end{pmatrix}
+\begin{pmatrix}
+\beta_0\\
+\beta_1
+\end{pmatrix} +
+\begin{pmatrix}
+\varepsilon_1\\
+\varepsilon_2\\
+\vdots\\
+\varepsilon_N
+\end{pmatrix},
+$$
+where $x_i$ can have value 0 or 1. In a more general setting, we could have more columns on the design matrix (thus more elements at $\mathbf{\beta}$-vector).
+
+In order to build a design matrix for our linear model we can use a model.matrix function. This helps us to build a matrices for Linear Algebra more easily using R's formula presentation. For example for a model holding a Smoke variable we can just write
+```{r}
+model.matrix(~ Smoke, data=downdat_small)
+```
+where the part "~ Smoke" is the formula. Please do not mind the attr()-texts in the end.
+
+Now, try to fill remainings of the R code below
+
+ - a) You can see an example with Smoke as continuous variable. It should be categorical one (we want values 0 and 1, not 1 and 2). Apply a function called factor() to make it categorical in R.
+```{r, eval=FALSE}
+# a) one predictor: Smoke
+model.matrix(~ Smoke, data=downdat_small)
+model.matrix(~ ??, data=downdat_small)
+```
+
+ - b) Apply the same idea to variable Age, which is text (string) data. Can you notice the difference? What happens here?
+```{r, eval=FALSE}
+# b) one predictor: Age
+model.matrix(~ ??, data=downdat_small)
+model.matrix(~ ??, data=downdat_small)
+```
+
+ - c) How many columns will be on a design matrix when one factor (aka. categorical) variable in the model with three levels? Try to relevel the factor so that ageclass=2 is the reference level.
+```{r, eval=FALSE}
+# c) one predictor: three groups
+ageclass <- factor(c(1,1,2,2,3,3))
+model.matrix(~ ageclass)
+?relevel
+ageclass_new <- ??(ageclass,??)
+model.matrix(~ ageclass_new)
+```
+
+ - d) Main effect model will be defined as follows:
+```{r, eval=FALSE}
+# d) main effects: Smoke and Age as categorical variables
+model.matrix(~ factor(Smoke) + Age, data=downdat_small)
+```
+
+ - e) Add an interaction of smoking and age to the main effect model's design matrix using a colon between the names of the variables. The second row shows a quick call for the same thing.
+```{r, eval=FALSE}
+# e) interaction: add a term Smoke:Age in the formula
+model.matrix(~ factor(Smoke) + Age + ??, data=downdat_small)
+model.matrix(~ factor(Smoke)*Age, data=downdat_small)
+```
+
+**Extra:** If you dislike writing factor(Smoke) all the time in the equations, you can make Smoke a factor in the data, so you need not to write that down every time.
+```{r, eval=FALSE}
+downdat_small$Smoke <- factor(downdat_small$Smoke)
+model.matrix(~ Smoke*Age, data=downdat_small)
+```
+
+#### Solution to Task 3
+```{r}
+# a) one predictor: Smoke
+model.matrix(~ Smoke, data=downdat_small)
+model.matrix(~ factor(Smoke), data=downdat_small)
+
+# b) one predictor: Age
+model.matrix(~ Age, data=downdat_small)
+model.matrix(~ factor(Age), data=downdat_small)
+
+# c) one predictor: three groups
+ageclass <- factor(c(1,1,2,2,3,3))
+model.matrix(~ ageclass)
+ageclass_new <- relevel(ageclass,2)
+model.matrix(~ ageclass_new)
+
+
+# d) main effects: Smoke and Age as categorical variables
+model.matrix(~ factor(Smoke) + Age, data=downdat_small)
+
+# e) interaction: add a term Smoke:Age in the formula
+model.matrix(~ factor(Smoke) + Age + Smoke:Age, data=downdat_small)
+model.matrix(~ factor(Smoke)*Age, data=downdat_small)
+```
+
+## Confounding
+
+Confounding is a situation where it for example appears that variable X affects variable Y but actually this relationship is caused by a third variable (a confounder) which affects the both X and Y.
+
+More generally, it could be that taking a confounder Z into account the relationship of X and Y is changed compared to what it seems to be without Z. The effect of X on Y may be removed or changed if Z is a confounder.
+
+It appears that in biomedical context this phenomenon is often called batch effects (please double check).
+
+### Task 4
+
+Investigate the relationship of Down syndrome (Y=0 healthy, Y=1 Down syndrome), mother's Age and mother's Smoking during the pregrancy. It is hypothesised that Smoking (nonsmoker: Smoke=1, smoker: Smoke=2) of a mother during a pregnancy is a (probabilistic) cause of Down syndrome. We will study if Age of mother will affect that.
+
+ - Start with a model having only Smoke as a predictor.
+ - Add Age and interaction Smoke:Age to the model.
+ - Note that the term Smoke:Age is not statistically significant, so leave it out.
+ - Finally, see if Smoke is significant. What will be the final model?
+ - Interpret the findings. What would you say about the previous theory that smoking causes Down syndrome? You can use table command below to understand what was happening with the data.
+```{r, eval=FALSE}
+attach(downdat)
+
+table(Smoke,Y)
+table(Smoke,Y,Age)
+
+m1 <- lm(?? ~ ??,data=downdat)
+summary(m1)
+
+m2 <- lm(?? ~ ??, data=downdat)
+summary(m2) # no interaction, leave Smoke:Age out
+
+m3 <- lm(?? ~ ??, data=downdat)
+summary(m3)
+
+m4 <- lm(?? ~ ??, data=downdat)
+summary(m4)
+```
+
+**If** you want to generate a nice report of your exercises, make all the error-generating code commented out, remove the text ", eval=FALSE" from all the code blocks above ("```{r}" remains). Then click Knit -button (Knit to HTML).
+
+#### Solution to Task 4
+
+```{r}
+attach(downdat)
+
+table(Smoke,Y)
+table(Smoke,Y,Age)
+
+m1 <- lm(Y ~ Smoke,data=downdat)
+summary(m1)
+
+m2 <- lm(Y ~ Smoke + Age + Smoke:Age, data=downdat)
+summary(m2)
+# no interaction, leave Smoke:Age out
+m3 <- lm(Y ~ Smoke + Age, data=downdat)
+summary(m3)
+# smoking does not affect the down syndrome risk, leave smoking out
+m4 <- lm(Y ~ Age, data=downdat)
+summary(m4)
+```
+Smoking does not affect the chances of having a child with Down syndrome. Mother's Age was a confounder.
+
+
+# All solutions
+
+#### Task 1
+
+```{r}
+# a)
+beta <- c(52, 0.55)
+X <- matrix(1:4,ncol=2,nrow=2)
+beta
+X
+# b)
+X %*% beta # $\beta X$
+# c)
+t(beta) %*% t(X) # $\beta^T X^T$
+# d) 
+Xsingular <- matrix(c(1:2,3*(1:2)),ncol=2,nrow=2)
+crossprod(1:5,6:10)
+crossprod(X,Xsingular)
+
+t(1:5) %*% c(6:10)
+t(X) %*% Xsingular
+```
+
+```{r}
+#solve(X)
+solve(Xsingular + 0.1*diag(2))
+solve(Xsingular + 0.01*diag(2))
+solve(Xsingular + 0.001*diag(2))
+```
+
+**Explanation:** In some statistical models a weighted diagonal matrix is added to allow solving a matrix. Having an increasingly smaller value added at diagonal makes the two vectors to become more and more in the same direction. This means that it will become increasingly difficult to determine the different orthogonal (90 degree angle) components from these vectors. Ultimately, this would lead to high inaccuracies in a statistical applications. Don't mind if this sounds difficult, our mathematical background is not enough to gather all the details on this topic.
+```{r}
+ZZ <- Xsingular + 0.3*diag(2)
+plot(0,0, xlim=c(-1,7),ylim=c(-1,7),xlab="",ylab="")
+arrows(0,0,ZZ[1,1],ZZ[2,1])
+arrows(0,0,ZZ[1,2],ZZ[2,2],col="red",lty=2)
+
+ZZ2 <- Xsingular + 0.1*diag(2)
+plot(0,0, xlim=c(-1,7),ylim=c(-1,7),xlab="",ylab="")
+arrows(0,0,ZZ2[1,1],ZZ2[2,1])
+arrows(0,0,ZZ2[1,2],ZZ2[2,2],col="red",lty=2)
+
+ZZ3 <- Xsingular + 0.01*diag(2)
+plot(0,0, xlim=c(-1,7),ylim=c(-1,7),xlab="",ylab="")
+arrows(0,0,ZZ3[1,1],ZZ3[2,1])
+arrows(0,0,ZZ3[1,2],ZZ3[2,2],col="red",lty=2)
+```
+
+#### Task 2
+
+```{r, eval=FALSE}
+load(file="father_and_son.Rdata")
+
+# fit a linear model
+fsmodel <- lm(sheight ~ fheight, data=father.son)
+summary(fsmodel)
+
+# use matrix algebra
+y <- father.son$sheight
+X <- cbind(1,father.son$fheight) # or model.matrix(~father.son$fheight)
+solve(t(X) %*% X) %*% t(X) %*% y
+```
+
+#### Task 3
+```{r}
+# a) one predictor: Smoke
+model.matrix(~ Smoke, data=downdat_small)
+model.matrix(~ factor(Smoke), data=downdat_small)
+
+# b) one predictor: Age
+model.matrix(~ Age, data=downdat_small)
+model.matrix(~ factor(Age), data=downdat_small)
+
+# c) one predictor: three groups
+# c) one predictor: three groups
+ageclass <- factor(c(1,1,2,2,3,3))
+model.matrix(~ ageclass)
+ageclass_new <- relevel(ageclass,2)
+model.matrix(~ ageclass_new)
+
+
+# d) main effects: Smoke and Age as categorical variables
+model.matrix(~ factor(Smoke) + Age, data=downdat_small)
+
+# e) interaction: add a term Smoke:Age in the formula
+model.matrix(~ factor(Smoke) + Age + Smoke:Age, data=downdat_small)
+model.matrix(~ factor(Smoke)*Age, data=downdat_small)
+```
+
+#### Task 4
+
+```{r}
+attach(downdat)
+
+table(Smoke,Y)
+table(Smoke,Y,Age)
+
+m1 <- lm(Y ~ Smoke,data=downdat)
+summary(m1)
+
+m2 <- lm(Y ~ Smoke + Age + Smoke:Age, data=downdat)
+summary(m2)
+# no interaction, leave Smoke:Age out
+m3 <- lm(Y ~ Smoke + Age, data=downdat)
+summary(m3)
+# smoking does not affect the down syndrome risk, leave smoking out
+m4 <- lm(Y ~ Age, data=downdat)
+summary(m4)
+```
+Smoking does not affect the chances of having a child with Down syndrome. Mother's Age was a confounder.
