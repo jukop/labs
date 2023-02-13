@@ -9,7 +9,7 @@ fontsize: 8pt
 output: 
   beamer_presentation:
     slide_level: 4
-    incremental: TRUE
+    incremental: FALSE
 ---
 
 ```{r setup, include=FALSE}
