@@ -1,15 +1,17 @@
 ---
 title: "Linear regression models with linear algebra and R"
 author: "Juho Kopra"
+date: "`r Sys.Date()`"
+output:
+  beamer_presentation:
+    slide_level: 4
+    incremental: yes
+  ioslides_presentation:
+    incremental: yes
+fontsize: 8pt
 institute: |
   University of Eastern Finland, School of Computing
   Partly based on material of [https://github.com/genomicsclass/labs](https://github.com/genomicsclass/labs)
-date: "`r Sys.Date()`"
-fontsize: 8pt
-output: 
-  beamer_presentation:
-    slide_level: 4
-    incremental: FALSE
 ---
 
 ```{r setup, include=FALSE}
@@ -169,11 +171,11 @@ t.test(Bodyweight ~ Diet, data=dat, var.equal=T)
 #### Dummy variables and indicator function
 
 
-Let's familiariase ourselves with dummy variables. Dummy variable is a variable which can have either value 0 or 1. For the example above, the dummy variable can be used to indicate that diet of a mouse is `hf` instead of `chow`. Thus, let's create a dummy variable so that it takes a value $1$ if diet is `hf` and value $0$ if diet is `chow`.
+ - Let's familiariase ourselves with dummy variables. Dummy variable is a variable which can have either value 0 or 1. For the example above, the dummy variable can be used to indicate that diet of a mouse is `hf` instead of `chow`. Thus, let's create a dummy variable so that it takes a value $1$ if diet is `hf` and value $0$ if diet is `chow`.
 
-In mathematical formulations, a useful way of reminding ourselves that a predictor is a dummy variable is to use an indicator function. Indicator function $\mathbf{1}(x)$ takes value $1$ if the condition `x` is true, and value $0$ otherwise. The notation of indicator variable nicely reminds us that it will give value $1$ or $0$.
+ - In mathematical formulations, a useful way of reminding ourselves that a predictor is a dummy variable is to use an indicator function. Indicator function $\mathbf{1}(x)$ takes value $1$ if the condition `x` is true, and value $0$ otherwise. The notation of indicator variable nicely reminds us that it will give value $1$ or $0$.
 
-Indicator function is
+ - Indicator function is
 \[
 \mathbf{1}(x) = \begin{cases}
       1 & \text{if condition $x$ is true}\\
@@ -181,13 +183,13 @@ Indicator function is
 \end{cases}
 \]
 
-For example we may write
+ - For example we may write
 \[
 Y_i = \beta_0 + \beta_1 \mathbf{1}(X_i = \texttt{hf}) + \varepsilon_i
 \]
 where $Y_i$ and $x_i$ stand for values of `Bodyweight` and `Diet` respectively, and  $i = 1,\dots,n$ and $\varepsilon_i \sim N(0,\sigma^2)$. In the above, the $\mathbf{1}(X_i = \texttt{hf})$ gives a value $1$ if `Diet` is `hf`. Otherwise it gives $0$.
 
-Thus, the expected value of $Y_i$ is $\beta_0$ if diet is `chow`. If the diet is `hf`, the expected values of $Y_i$ is $\beta_0+\beta_1$.
+ - Thus, the expected value of $Y_i$ is $\beta_0$ if diet is `chow`. If the diet is `hf`, the expected values of $Y_i$ is $\beta_0+\beta_1$.
 
 
 \newpage
@@ -198,7 +200,7 @@ Linear algebra is a branch of mathematics where instead of numbers (aka scalars)
 
 #### Transpose
 
-Transpose of matrix $\mathbf{A}$ is denoted as $\mathbf{A}^T$
+ - Transpose of matrix $\mathbf{A}$ is denoted as $\mathbf{A}^T$
 \[
 \mathbf{A}=\begin{pmatrix}
   1 & 2\\
@@ -212,6 +214,7 @@ Transpose of matrix $\mathbf{A}$ is denoted as $\mathbf{A}^T$
 \]
 Above matrix $A$ is $n$ times $p$ matrix, where $n=2, p=3$.
 
+ - The above in R
 ```{r}
 A <- matrix(c(1,2,
               3,4,
@@ -222,7 +225,7 @@ t(A)
 
 ### Vector
 
-A matrix with only one column is called a vector.
+ - A matrix with only one column is called a vector.
 \[
 d=\begin{pmatrix}
   1 \\
@@ -231,7 +234,7 @@ d=\begin{pmatrix}
 \end{pmatrix}
 \]
 
-A transpose of a vector is a row vector.
+ - A transpose of a vector is a row vector.
 \[
 d^T=\begin{bmatrix}
   1  & 3 & 5\\
@@ -240,7 +243,7 @@ d^T=\begin{bmatrix}
 
 #### Cross product
 
-A cross product (aka matrix multiplication) of row vector with a column vector is 
+ - A cross product (aka matrix multiplication) of row vector with a column vector is 
 \[
 \begin{bmatrix}
   1  & 2 & 3\\
@@ -258,6 +261,7 @@ A cross product (aka matrix multiplication) of row vector with a column vector i
 \end{bmatrix}
 \]
 
+ - Example with R
 ```{r}
 d <- c(4,5,6)
 d
@@ -268,7 +272,7 @@ c(1,2,3) %*% d
 
 #### Identity matrix
 
-Identity matrix is $\mathbf{I}$ has 1 on diagonal and 0 elsewhere. E.g. 
+ - Identity matrix is $\mathbf{I}$ has 1 on diagonal and 0 elsewhere. E.g. 
 \[
 \mathbf{I}_3=\begin{pmatrix}
   1 & 0 & 0\\
@@ -282,20 +286,20 @@ diag(3)
 
 #### Square matrix and inverse of a matrix
 
-If matrix has the same number of rows and columns, it is called a square matrix.
+ - If matrix has the same number of rows and columns, it is called a square matrix.
 
-If a square matrix $\mathbf{B}$ has determinant, which is not zero, then $\mathbf{B}$ is invertible, which means that it is possible to calculate an inverse of matrix $\mathbf{B}$ that is $\mathbf{B^{-1}}$.
+ - If a square matrix $\mathbf{B}$ has determinant, which is not zero, then $\mathbf{B}$ is invertible, which means that it is possible to calculate an inverse of matrix $\mathbf{B}$ that is $\mathbf{B^{-1}}$.
 
-```{r}
-# Let's create a square matrix
-B <- t(A) %*% A
-B
-det(B) #determinant is not zero => invertible
-solve(B)
-```
+ - In R we can do that as
+  ```{r}
+  # Let's create a square matrix
+  B <- t(A) %*% A
+  B
+  det(B) #determinant is not zero => invertible
+  solve(B)
+  ```
 
-
-For invertible matrix $\mathbf{B}$ it follows that $\mathbf{B} \mathbf{B}^{-1} = \mathbf{I}$ and also $\mathbf{B}^{-1} \mathbf{B} = \mathbf{I}$.
+ - For invertible matrix $\mathbf{B}$ it follows that $\mathbf{B} \mathbf{B}^{-1} = \mathbf{I}$ and also $\mathbf{B}^{-1} \mathbf{B} = \mathbf{I}$.
 
 ### Solving systems of equations using linear algebra
 
@@ -573,7 +577,7 @@ To estimate coefficients for this model, we use `lm` with the formula `~ type + 
 
 ```{r}
 fitTL <- lm(friction ~ type + leg, data=spider)
-summary(fitTL)
+fitTL
 ```
 
 #### {-}
@@ -586,21 +590,22 @@ R uses the name `Coefficients` to denote the component containing the least squa
 
 #### Mathematical representation
 
-The model we are fitting above can be written as
-
+ - The model we are fitting above can be written as
 \[
 Y_i = \beta_0 + \beta_1 x_{i,1} + \beta_2 x_{i,2} + \beta_3 x_{i,3} + \beta_4 x_{i,4} + \varepsilon_i, i=1,\dots,n
 \]
-or consider the indicator variable style
+ - or consider the indicator variable style
 \[
-\texttt{friction} = \beta_0 + \beta_1\mathbf{1}(\texttt{type=push}) + \beta_2\mathbf{1}(\texttt{leg=L2}) + \beta_3 \mathbf{1}(\texttt{leg=L3}) + \beta_4 \mathbf{1}(\texttt{leg=L4}) + \varepsilon_i, ~i=1,\dots,n
+\texttt{friction} = \beta_0 + \beta_1\mathbf{1}(\texttt{type=push}) + \beta_2\mathbf{1}(\texttt{leg=L2}) + \beta_3 \mathbf{1}(\texttt{leg=L3}) + \beta_4 \mathbf{1}(\texttt{leg=L4}) + \varepsilon_i,
 \]
+where $i=1,\dots,n$
 
 <!-- with the $x$ all indicator variables denoting push or pull and which leg. For example, a push on leg 3 will have $x_{i,1}$ and $x_{i,3}$ equal to 1 and the rest would be 0. Throughout this section we will refer to the $\beta$ s with the effects they represent. For example we call $\beta_0$ the intercept, $\beta_1$ the pull effect, $\beta_2$ the L2 effect, etc. We do not observe the coefficients, e.g.  $\beta_1$, directly, but estimate them with, e.g. $\hat{\beta}_4$. -->
 
-We can now form the matrix $\mathbf{X}$ depicted above and obtain the least square estimates with:
-
-$$ \hat{\boldsymbol{\beta}} = (\mathbf{X}^\top \mathbf{X})^{-1} \mathbf{X}^\top \mathbf{Y} $$
+ - We can now form the matrix $\mathbf{X}$ depicted above and obtain the least square estimates with:
+\[
+\hat{\boldsymbol{\beta}} = (\mathbf{X}^\top \mathbf{X})^{-1} \mathbf{X}^\top \mathbf{Y}
+\]
 
 ```{r}
 Y <- spider$friction
@@ -688,4 +693,4 @@ cT %*% coefs
 
 There will be an update on exercises:
 
- - Topic of confounding (the very last) will be removed. I try to figure a task about contrasts.
+ - Topic of confounding is noted not needed to be completed.
